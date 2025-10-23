@@ -1,7 +1,5 @@
 import type { RequestHandler } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../database"
 
 export class ProductionController {
   index: RequestHandler = async (_req, res) => {

@@ -1,9 +1,7 @@
 import type { RequestHandler } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../database"
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
-
-const prisma = new PrismaClient();
 
 export class AuthController {
 
@@ -71,20 +69,42 @@ export class AuthController {
 
   profile: RequestHandler = async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const authUser = (req as any).user;
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { id: true, name: true, email: true, role: true },
-      });
-
-      if (!user) {
+      if (!authUser) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
+
+      const userId = authUser.id;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId},
+        include: {
+          orders: true
+        }
+      })
 
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar perfil" });
+    }
+  };
+
+  showUsers: RequestHandler = async (_req, res) => {
+    try {
+      const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        segment: true,
+        totalSpent: true
+      },
+    });
+      return res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao listar usuários" });
     }
   };
 }

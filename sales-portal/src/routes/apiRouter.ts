@@ -22,10 +22,13 @@ const indicators = new IndicatorController();
 router.post("/register", auth.register);
 router.post("/login", auth.login);
 router.get("/profile", authMiddleware, auth.profile);
+router.get("/users", authMiddleware, adminMiddleware, auth.showUsers);
 
-router.post("/orders", authMiddleware, orders.create);
+router.post("/order/user", authMiddleware, orders.userCreate);
+router.post("/order/admin", authMiddleware, adminMiddleware, orders.adminCreate);
 
 router.get("/stock", authMiddleware, stock.index);
+router.post("/stock", authMiddleware, adminMiddleware, stock.create);
 router.put("/stock/:id", authMiddleware, adminMiddleware, stock.update);
 
 router.get("/transactions", authMiddleware, adminMiddleware, transaction.index);
@@ -40,6 +43,6 @@ router.get("/support", authMiddleware, support.index);
 router.post("/support", support.create);
 router.put("/support/:id", authMiddleware, support.update);
 
-router.get("/indicators", authMiddleware, indicators.index);
+router.get("/indicators", authMiddleware, adminMiddleware,indicators.index);
 
 export default router;

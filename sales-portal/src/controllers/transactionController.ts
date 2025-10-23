@@ -1,6 +1,32 @@
 import type { Request, Response } from "express";
 import { prisma } from "../database";
-import type { Prisma } from "@prisma/client";
+
+// src/controllers/transactionController.ts
+
+export type TransactionWithRelations = {
+  id: number;
+  quantity: number;
+  totalPrice: number;
+  city: string;
+  state: string;
+  user: {
+    id: number;
+    name: string;
+    segment: string;
+  };
+  product: {
+    id: number;
+    name: string;
+    category: string;
+    price: number;
+  };
+  order: {
+    id: number;
+    status: string;
+    statusDetail: string;
+    createdAt: Date;
+  };
+};
 
 export class TransactionController {
   // GET /transactions
@@ -49,7 +75,7 @@ export class TransactionController {
       // Segmento de cliente
       if (clientSegment) {
         filters.user = {
-          segment: { equals: String(clientSegment).toLowerCase() },
+          segment: { equals: String(clientSegment) },
         };
       }
 
@@ -65,7 +91,7 @@ export class TransactionController {
       });
 
       // Formatação do resultado
-      const formatted = transactions.map((t: Prisma.TransactionClient) => ({
+      const formatted = transactions.map(t => ({
         transactionId: t.id,
         orderId: t.order?.id,
         date: t.order?.createdAt,
@@ -88,15 +114,17 @@ export class TransactionController {
         state: t.state,
       }));
 
+      type FormattedTransaction = typeof formatted[number];
+
       return res.status(200).json({
         totalRecords: formatted.length,
         generatedAt: new Date(),
         filtersUsed: { startDate, endDate, region, productCategory, clientSegment },
         summary: {
-          totalSalesValue: formatted.reduce((acc: number, t: Prisma.TransactionClient) => acc + (t.totalPrice || 0), 0 as number),
-          totalQuantitySold: formatted.reduce((acc: number, t: Prisma.TransactionClient) => acc + (t.product.quantity || 0), 0),
-          uniqueClients: new Set(formatted.map((t: Prisma.TransactionClient) => t.customer.id)).size,
-          uniqueProducts: new Set(formatted.map((t: Prisma.TransactionClient) => t.product.id)).size,
+          totalSalesValue: formatted.reduce((acc: number, t: FormattedTransaction) => acc + (t.totalPrice || 0), 0 as number),
+          totalQuantitySold: formatted.reduce((acc: number, t: FormattedTransaction) => acc + (t.product.quantity || 0), 0),
+          uniqueClients: new Set(formatted.map((t: FormattedTransaction) => t.product.id)).size,
+          uniqueProducts: new Set(formatted.map((t: FormattedTransaction) => t.product.id)).size,
         },
         data: formatted,
       });
@@ -112,12 +140,7 @@ export class TransactionController {
 
     try {
       const transaction = await prisma.transaction.findUnique({
-        where: { id: Number(id) },
-        include: {
-          user: true,
-          product: true,
-          order: true,
-        },
+        where: { id: Number(id) }
       });
 
       if (!transaction) {

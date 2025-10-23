@@ -31,7 +31,7 @@ model User {
 
 model Product {
   id           Int             @id @default(autoincrement())
-  name         String
+  name         String          @unique
   category     String
   price        Float
   stock        Int             @default(0)
@@ -53,8 +53,9 @@ model Order {
   state        String?
   createdAt    DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  product     Product       @relation(fields: [productId], references: [id])
+  Transaction Transaction[]
 }
 
 model Transaction {
@@ -77,6 +78,7 @@ model Transaction {
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
 }
 
 model Production {
@@ -90,7 +92,7 @@ model Production {
 
 model SupportTicket {
   id          Int       @id @default(autoincrement())
-  clientName  String
+  userId      Int
   productId   Int
   description String
   status      Status    @default(open)
