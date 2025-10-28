@@ -15,26 +15,38 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
+  clientType ClientType
   name       String
-  email      String   @unique
+  cpf        String?    @unique
+  cnpj       String?    @unique
+  email      String     @unique
   password   String
-  role       Role     @default(user)
-  segment    Segment  @default(Bronze)
-  totalSpent Float    @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  phone      String
+  street     String
+  number     String
+  complement String
+  district   String
+  city       String
+  state      String
+  role       Role       @default(user)
+  segment    Segment    @default(Bronze)
+  totalSpent Float      @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   orders       Order[]
   transactions Transaction[]
 }
 
 model Product {
-  id           Int             @id @default(autoincrement())
-  name         String          @unique
-  category     String
-  price        Float
-  stock        Int             @default(0)
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  category String
+  price    Float
+  stock    Int     @default(0)
+  imageUrl String?
+
   orders       Order[]
   production   Production[]
   support      SupportTicket[]
@@ -99,6 +111,11 @@ model SupportTicket {
   openedAt    DateTime  @default(now())
   closedAt    DateTime?
   product     Product   @relation(fields: [productId], references: [id])
+}
+
+enum ClientType {
+  PF
+  PJ
 }
 
 enum Role {

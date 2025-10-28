@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { RequestHandler } from "express";
 import { prisma } from "../database";
 
 // src/controllers/transactionController.ts
@@ -30,7 +30,7 @@ export type TransactionWithRelations = {
 
 export class TransactionController {
   // GET /transactions
-  index = async (req: Request, res: Response) => {
+  index: RequestHandler = async (req, res) => {
     try {
       const { startDate, endDate, region, productCategory, clientSegment } = req.query;
 
@@ -135,7 +135,7 @@ export class TransactionController {
   };
 
   // GET /transactions/:id
-  show = async (req: Request, res: Response) => {
+  show: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     try {
@@ -155,7 +155,7 @@ export class TransactionController {
   };
 
   // DELETE /transactions/:id
-  delete = async (req: Request, res: Response) => {
+  delete: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     try {

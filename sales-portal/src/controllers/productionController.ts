@@ -18,7 +18,10 @@ export class ProductionController {
       const { productId, quantityPlanned } = req.body;
 
       const production = await prisma.production.create({
-        data: { productId, quantityPlanned },
+        data: { 
+          productId: Number(productId), 
+          quantityPlanned: Number(quantityPlanned) 
+        }
       });
 
       res.status(201).json(production);
@@ -34,7 +37,9 @@ export class ProductionController {
 
       const updated = await prisma.production.update({
         where: { id: Number(id) },
-        data: { status, quantityProduced },
+        data: { 
+          status, 
+          quantityProduced: Number(quantityProduced) },
       });
 
       res.json(updated);
