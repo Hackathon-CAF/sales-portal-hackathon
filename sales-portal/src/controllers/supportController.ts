@@ -1,5 +1,6 @@
 import type { RequestHandler } from "express";
 import { prisma } from "../database"
+import { updateSupportTicketSchema } from "../schemas/supportSchema";
 
 export class SupportController {
   index: RequestHandler = async (_req, res) => {
@@ -13,12 +14,37 @@ export class SupportController {
     }
   };
 
+  getUserTickets: RequestHandler = async (req, res) => {
+    try {
+      const authUser = (req as any).user;
+      if (!authUser) return res.status(401).json({ error: "Não autenticado" });
+
+      const tickets = await prisma.supportTicket.findMany({
+        where: { userId: authUser.id },
+        include: { product: true },
+      });
+
+      res.json(tickets);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Erro ao buscar chamados" });
+    }
+  };
+
   create: RequestHandler = async (req, res) => {
     try {
-      const { clientName, productId, description } = req.body;
+      const authUser = (req as any).user;
+      if (!authUser) return res.status(401).json({ error: "Não autenticado" });
+
+      const { productId, description } = req.body;
 
       const ticket = await prisma.supportTicket.create({
-        data: { clientName, productId, description },
+        data: {
+          userId: authUser.id,
+          productId: Number(productId),
+          description,
+          status: "open" // assumindo status inicial
+        },
       });
 
       res.status(201).json(ticket);
@@ -30,11 +56,11 @@ export class SupportController {
   update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { status, closedAt } = req.body;
+      const data = updateSupportTicketSchema.parse(req.body);
 
       const updated = await prisma.supportTicket.update({
         where: { id: Number(id) },
-        data: { status, closedAt },
+        data
       });
 
       res.json(updated);

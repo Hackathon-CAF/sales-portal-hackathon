@@ -1,12 +1,12 @@
 import { prisma } from "../database";
-import type { Request, Response } from "express";
+import type { RequestHandler } from "express";
 
 export class OrderController {
-  userCreate = async (req: Request, res: Response) => {
+  userCreate: RequestHandler = async (req, res) => {
     try {
       const user = (req as any).user;
       const userId = user.id;
-      const { productId, quantity, city, state } = req.body;
+      const { productId, quantity } = req.body;
 
       const product = await prisma.product.findUnique({ where: { id: productId } });
 
@@ -23,8 +23,8 @@ export class OrderController {
             productId,
             quantity,
             totalPrice,
-            city,
-            state,
+            city: user.city,
+            state: user.state,
             status: "pending",
             statusDetail: "Awaiting payment",
           },
@@ -59,8 +59,8 @@ export class OrderController {
             orderDate: order.createdAt,
             status: order.status,
             statusDetail: order.statusDetail,
-            city,
-            state,
+            city: user.city,
+            state: user.state,
             clientName: user.name,
             clientSegment: newSegment,
             productName: product.name,
@@ -84,9 +84,9 @@ export class OrderController {
     }
   };
 
-  adminCreate = async (req: Request, res: Response) => {
+  adminCreate: RequestHandler = async (req, res) => {
     try {
-      const { userId, productId, quantity, city, state } = req.body;
+      const { userId, productId, quantity } = req.body;
 
       const user = await prisma.user.findUnique({ where: { id: userId } });
       const product = await prisma.product.findUnique({ where: { id: productId } });
@@ -104,8 +104,8 @@ export class OrderController {
             productId,
             quantity,
             totalPrice,
-            city,
-            state,
+            city: user.city,
+            state: user.state,
             status: "pending",
             statusDetail: "Awaiting payment",
           },
@@ -140,8 +140,8 @@ export class OrderController {
             orderDate: order.createdAt,
             status: order.status,
             statusDetail: order.statusDetail,
-            city,
-            state,
+            city: user.city,
+            state: user.state,
             clientName: user.name,
             clientSegment: newSegment,
             productName: product.name,
@@ -162,6 +162,38 @@ export class OrderController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Error creating order" });
+    }
+  };
+
+  userOrders: RequestHandler = async (req, res) => {
+    try {
+      const authUser = (req as any).user;
+      if (!authUser) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      // opcional: aceitar filtros via query params
+      const { status, startDate, endDate } = req.query;
+
+      const filters: any = { userId: authUser.id };
+
+      if (status) filters.status = status;
+      if (startDate || endDate) {
+        filters.createdAt = {};
+        if (startDate) filters.createdAt.gte = new Date(startDate as string);
+        if (endDate) filters.createdAt.lte = new Date(endDate as string);
+      }
+
+      const orders = await prisma.order.findMany({
+        where: filters,
+        orderBy: { createdAt: "desc" },
+        include: { product: true } 
+      });
+
+      res.json(orders);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Erro ao buscar pedidos do usuário" });
     }
   };
 }
