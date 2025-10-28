@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config(); // ajusta o caminho conforme sua estrutura
+
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;

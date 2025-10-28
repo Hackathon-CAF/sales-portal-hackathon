@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "ClientType" AS ENUM ('PF', 'PJ');
+
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('admin', 'user');
 
 -- CreateEnum
@@ -10,9 +13,19 @@ CREATE TYPE "Status" AS ENUM ('pending', 'in_progress', 'open', 'closed', 'compl
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
+    "clientType" "ClientType" NOT NULL,
+    "name" TEXT,
+    "cpf" TEXT,
+    "cnpj" TEXT,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "street" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
+    "complement" TEXT NOT NULL,
+    "district" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'user',
     "segment" "Segment" NOT NULL DEFAULT 'Bronze',
     "totalSpent" DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -29,6 +42,7 @@ CREATE TABLE "Product" (
     "category" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "stock" INTEGER NOT NULL DEFAULT 0,
+    "imageUrl" TEXT,
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -85,7 +99,7 @@ CREATE TABLE "Production" (
 -- CreateTable
 CREATE TABLE "SupportTicket" (
     "id" SERIAL NOT NULL,
-    "clientName" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'open',
@@ -96,7 +110,16 @@ CREATE TABLE "SupportTicket" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_cnpj_key" ON "User"("cnpj");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -109,6 +132,9 @@ ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Production" ADD CONSTRAINT "Production_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../database"
+import z from "zod";
+import { createProductSchema, updateProductSchema } from "../schemas/productSchema";
 
 export class StockController {
   index: RequestHandler = async (_req, res) => {
@@ -13,19 +13,48 @@ export class StockController {
     }
   };
 
+  create: RequestHandler = async (req, res) => {
+    try {
+      const data = createProductSchema.parse(req.body);
+
+      const product = await prisma.product.create({ data });
+
+      res.status(201).json({ message: "Produto registrado com sucesso", product });
+    } catch (error: any) {
+
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Erro de validação", details: error.issues });
+      }
+
+      else if (error.code === "P2002") {
+        if (error.meta?.target?.includes("name")) {
+          return res.status(400).json({ message: "Produto com esse nome já existe." });
+        }
+      }
+
+      console.error(error);
+      res.status(500).json({ error: "Erro ao criar produto" });
+    }
+  };
+
   update: RequestHandler = async (req, res) => {
     try {
-      const { id } = req.params;
-      const { stock } = req.body;
+      const productId  = Number(req.params.id);
+      const data = updateProductSchema.parse(req.body);
 
-      const product = await prisma.product.update({
-        where: { id: Number(id) },
-        data: { stock },
+    // Atualiza apenas campos enviados
+      const updatedProduct = await prisma.product.update({
+        where: { id: productId },
+        data
       });
 
-      res.json(product);
+      res.json({ message: "Produto atualizado com sucesso", updatedProduct });
     } catch (error) {
-      res.status(500).json({ error: "Erro ao atualizar estoque" });
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Erro de validação", details: error.issues });
+      }
+      console.error(error);
+      res.status(500).json({ error: "Erro ao atualizar produto" });
     }
   };
 }

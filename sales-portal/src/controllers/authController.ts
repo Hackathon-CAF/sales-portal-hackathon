@@ -1,38 +1,58 @@
 import type { RequestHandler } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../database"
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/jwt";
+import z, { ZodError } from "zod";
+import { PFSchema, PJSchema, updateUserSchema } from "../schemas/userSchema";
 
-const prisma = new PrismaClient();
+const userSchema = z.union([PFSchema, PJSchema]);
 
 export class AuthController {
 
   register: RequestHandler = async (req, res) => {
     try {
-      const { name, email, password, role } = req.body;
+      const data = userSchema.parse(req.body);
 
-      if (!name || !email || !password) {
+      if (!data.clientType || 
+        !data.name || 
+        !data.email || 
+        !data.password || 
+        !data.phone || 
+        !data.street || 
+        !data.number || 
+        !data.complement || 
+        !data.district || 
+        !data.city || 
+        !data.state ) {
         return res.status(400).json({ error: "Preencha todos os campos obrigatórios." });
       }
 
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
       if (existingUser) {
         return res.status(400).json({ error: "E-mail já registrado." });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(data.password, 10);
 
       const user = await prisma.user.create({
         data: {
-          name,
-          email,
-          password: hashedPassword,
-          role: role || "user", // "admin" ou "user"
-        },
+          ...data,
+          password: hashedPassword
+        }
       });
 
       res.status(201).json({ message: "Usuário criado com sucesso", user });
     } catch (error) {
+      if (error instanceof ZodError) {
+        // Mostra todos os erros de validação
+        console.error("Erro de validação Zod:", error.issues);
+
+        return res.status(400).json({
+          error: "Erro de validação",
+          details: error.issues // array com { path, message, code }
+        });
+      }
+
       console.error(error);
       res.status(500).json({ error: "Erro ao registrar usuário" });
     }
@@ -58,10 +78,15 @@ export class AuthController {
         role: user.role as "admin" | "user"
       });
 
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 24 * 60 * 60 * 1000, // 1 dia
+      });
+
       res.json({
         message: "Login realizado com sucesso",
-        user: { id: user.id, name: user.name, email: user.email, role: user.role },
-        token,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role }
       });
     } catch (error) {
       console.error(error);
@@ -71,20 +96,91 @@ export class AuthController {
 
   profile: RequestHandler = async (req, res) => {
     try {
-      const userId = (req as any).userId;
+      const authUser = (req as any).user;
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { id: true, name: true, email: true, role: true },
-      });
-
-      if (!user) {
+      if (!authUser) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
+
+      const userId = authUser.id;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId},
+        include: {
+          orders: true
+        }
+      })
 
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar perfil" });
     }
   };
+
+  updateUser: RequestHandler = async (req, res) => {
+    try {
+      const authUser = (req as any).user;
+
+      if (!authUser) {
+        return res.status(404).json({ error: "Usuário não encontrado" });
+      }
+
+      const data = updateUserSchema.parse(req.body);
+
+      // Atualiza apenas os campos enviados
+      const updatedUser = await prisma.user.update({
+        where: { id: authUser.id },
+        data
+      });
+
+      res.json({ message: "Perfil atualizado com sucesso", updatedUser });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Erro de validação", details: error.issues });
+      }
+      console.error(error);
+      res.status(500).json({ error: "Erro ao atualizar perfil" });
+    }
+  };
+
+  showUsers: RequestHandler = async (_req, res) => {
+    try {
+      const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        segment: true,
+        totalSpent: true
+      },
+    });
+      return res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao listar usuários" });
+    }
+  };
+
+  updateRole: RequestHandler = async (req, res) => {
+    try {
+      const { email, role } = req.body;
+
+      if (!["admin", "user"].includes(role)) {
+        return res.status(400).json({ error: "Role inválida" });
+      }
+
+      if (email === "admin@admin.com" && role !== "admin") {
+        return res.status(403).json({ error: "Não é permitido alterar o papel do admin padrão" });
+      }
+      
+      const updatedUser = await prisma.user.update({
+        where: { email },
+        data: { role }
+      })
+
+      res.status(200).json({ message: `Usuário atualizado para ${role}`, updatedUser });
+    } catch (error) {
+      res.status(500).json({ error: "Erro ao atualizar o papel do usuário" });
+    }
+  }
 }

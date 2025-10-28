@@ -23,12 +23,19 @@ router.post("/register", auth.register);
 router.post("/login", auth.login);
 router.get("/profile", authMiddleware, auth.profile);
 
-router.post("/orders", authMiddleware, orders.create);
+router.get("/users", authMiddleware, adminMiddleware, auth.showUsers);
+router.put("/users", authMiddleware, auth.updateUser);
+router.put("/users/role", authMiddleware, adminMiddleware, auth.updateRole);
+
+router.get("/order", authMiddleware, orders.userOrders)
+router.post("/order/user", authMiddleware, orders.userCreate);
+router.post("/order/admin", authMiddleware, adminMiddleware, orders.adminCreate);
 
 router.get("/stock", authMiddleware, stock.index);
+router.post("/stock", authMiddleware, adminMiddleware, stock.create);
 router.put("/stock/:id", authMiddleware, adminMiddleware, stock.update);
 
-router.get("/transactions", authMiddleware, adminMiddleware, transaction.index);
+router.get("/transactions/admin", authMiddleware, adminMiddleware, transaction.index);
 router.get("/transactions/:id", authMiddleware, adminMiddleware, transaction.show);
 router.delete("/transactions/:id", authMiddleware, adminMiddleware, transaction.delete);
 
@@ -36,10 +43,11 @@ router.get("/production", authMiddleware, production.index);
 router.post("/production", authMiddleware, adminMiddleware, production.create);
 router.put("/production/:id", authMiddleware, adminMiddleware, production.updateStatus);
 
-router.get("/support", authMiddleware, support.index);
-router.post("/support", support.create);
-router.put("/support/:id", authMiddleware, support.update);
+router.get("/support", authMiddleware, support.getUserTickets)
+router.get("/support/admin", authMiddleware, adminMiddleware, support.index);
+router.post("/support", authMiddleware, support.create);
+router.put("/support/:id", authMiddleware, adminMiddleware, support.update);
 
-router.get("/indicators", authMiddleware, indicators.index);
+router.get("/indicators", authMiddleware, adminMiddleware,indicators.index);
 
 export default router;
