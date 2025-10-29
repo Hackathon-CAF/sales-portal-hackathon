@@ -48,6 +48,8 @@ router.get("/support", authMiddleware, support.getUserTickets)
 router.get("/support/admin", authMiddleware, adminMiddleware, support.index);
 router.post("/support", authMiddleware, support.create);
 router.put("/support/:id", authMiddleware, adminMiddleware, support.update);
+router.post("/support/:id/message", authMiddleware, support.sendMessage)
+router.get("/support/:id/message", authMiddleware, support.getMessages)
 
 router.get("/indicators", authMiddleware, adminMiddleware,indicators.index);
 

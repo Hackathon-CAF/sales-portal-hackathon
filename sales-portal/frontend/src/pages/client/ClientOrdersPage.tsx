@@ -143,7 +143,7 @@ const ClientOrdersPage: React.FC = () => {
       cancelled: "danger"
     };
     
-    return `badge bg-${statusConfig[status] || 'secondary'}`;
+    return `badge text-body-secondary bg-${statusConfig[status] || 'secondary'}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -196,7 +196,7 @@ const ClientOrdersPage: React.FC = () => {
                 </div>
                 <div className="card-footer">
                   <button
-                    className="btn btn-outline-primary w-100"
+                    className="btn btn-outline-danger w-100 mt-2 mb-2"
                     onClick={() => handleOpenTicket(order)}
                     disabled={ticketLoading === order.id}
                   >
@@ -256,7 +256,7 @@ const ClientOrdersPage: React.FC = () => {
                 </button>
                 <button 
                   type="button" 
-                  className="btn btn-primary" 
+                  className="btn btn-danger" 
                   onClick={handleSubmitTicket}
                   disabled={!ticketDescription.trim() || ticketLoading !== null}
                 >
@@ -271,10 +271,10 @@ const ClientOrdersPage: React.FC = () => {
       {/* Lista de Chamados Abertos */}
       {supportTickets.length > 0 && (
         <div className="mt-5">
-          <h3>Meus Chamados de Assistência</h3>
-          <div className="list-group">
+          <h3 className="mb-4">Meus Chamados de Assistência</h3>
+          <div className="list-group d-flex gap-4">
             {supportTickets.map((ticket) => (
-              <div key={ticket.id} className="list-group-item">
+              <div key={ticket.id} className="list-group-item shadow-lg rounded-3">
                 <div className="d-flex justify-content-between align-items-start">
                   <div>
                     <h6>Chamado #{ticket.id} - Produto ID: {ticket.productId}</h6>
@@ -284,7 +284,7 @@ const ClientOrdersPage: React.FC = () => {
                       {ticket.closedAt && ` • Fechado em: ${formatDate(ticket.closedAt)}`}
                     </small>
                   </div>
-                  <span className={`badge ${ticket.status === 'open' ? 'bg-warning' : 'bg-success'}`}>
+                  <span className={`badge mt-2 text-body-secondary ${ticket.status === 'open' ? 'bg-warning' : 'bg-success'}`}>
                     {ticket.status === 'open' ? 'Aberto' : 'Fechado'}
                   </span>
                 </div>

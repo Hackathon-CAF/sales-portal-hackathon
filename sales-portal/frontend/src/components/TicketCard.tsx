@@ -1,8 +1,10 @@
 import React from "react";
+import "./componentsStyles.css"
 
 interface Ticket {
   id: number;
-  productId: number;
+  userName?: string;       
+  productName: string;   
   description: string;
   status: string;
   openedAt: string;
@@ -15,12 +17,16 @@ interface TicketCardProps {
 
 const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
   return (
-    <div className="card p-3">
-      <h5>Chamado #{ticket.id}</h5>
-      <p>Produto ID: {ticket.productId}</p>
-      <p>Status: {ticket.status}</p>
-      <p>Descrição: {ticket.description}</p>
-      <p>Data: {new Date(ticket.openedAt).toLocaleString()}</p>
+    <div className="card ticket-card p-3">
+      <h5 className="ticket-title mb-3">Chamado #{ticket.id}</h5>
+      <p><strong>Usuário:</strong> {ticket.userName}</p>
+      <p><strong>Produto:</strong> {ticket.productName}</p>
+      <p><strong>Status:</strong> {ticket.status}</p>
+      <p><strong>Descrição:</strong> {ticket.description}</p>
+      <p><strong>Aberto em:</strong> {new Date(ticket.openedAt).toLocaleString()}</p>
+      {ticket.closedAt && (
+        <p><strong>Fechado em:</strong> {new Date(ticket.closedAt).toLocaleString()}</p>
+      )}
     </div>
   );
 };

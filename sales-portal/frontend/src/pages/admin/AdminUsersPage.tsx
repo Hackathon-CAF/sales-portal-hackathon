@@ -6,7 +6,7 @@ interface User {
   name: string;
   email: string;
   role: "admin" | "user";
-  segment?: string;
+  segment?: "gold" | "silver" | "bronze" | string;
   totalSpent?: number;
 }
 
@@ -37,34 +37,61 @@ const AdminUsersPage: React.FC = () => {
   if (!user || user.role !== "admin") return <p>Acesso negado</p>;
 
   return (
-    <div className="container mt-3">
-      <h2>Usuários</h2>
+    <div className="content-container p-2">
+      <h2 className="mb-4 page-title">Usuários</h2>
       {loading && <p>Carregando...</p>}
-      {error && <p className="text-danger">{error}</p>}
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Segmento</th>
-            <th>Total Gasto</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td>{u.id}</td>
-              <td>{u.name}</td>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-              <td>{u.segment}</td>
-              <td>R$ {u.totalSpent?.toFixed(2)}</td>
+      {error && <div className="alert alert-danger">{error}</div>}
+
+    <div className="card shadow-sm p-3 bg-light rounded table-card">
+      <div className="table-responsive">
+        <table className="table table-hover align-middle">
+          <thead className="table-header">
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Função</th>
+              <th>Segmento</th>
+              <th>Total Gasto</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((u) => (
+              <tr key={u.id}>
+                <td>{u.id}</td>
+                <td>{u.name}</td>
+                <td>{u.email}</td>
+                <td>
+                  <span
+                    className={`badge ${
+                      u.role === "admin" ? "bg-danger" : "bg-secondary"
+                    }`}
+                  >
+                    {u.role}
+                  </span>
+                </td>
+                <td>
+                  {u.segment ? (
+                    <span className={`segment-badge ${u.segment.toLowerCase()}`}>
+                      {u.segment.charAt(0).toUpperCase() + u.segment.slice(1)}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>{u.totalSpent ? `R$ ${u.totalSpent.toFixed(2)}` : "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+      {users.length === 0 && !loading && (
+        <p className="text-muted text-center mt-4">
+          Nenhum usuário encontrado.
+        </p>
+      )}
     </div>
   );
 };

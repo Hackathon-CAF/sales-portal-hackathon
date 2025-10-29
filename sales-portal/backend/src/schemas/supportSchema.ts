@@ -6,3 +6,7 @@ export const updateSupportTicketSchema = z.object({
     if (typeof arg === "string" || arg instanceof Date) return new Date(arg);
   }, z.date().optional())
 });
+
+export const createMessageSchema = z.object({
+  content: z.string().min(1, "A mensagem não pode estar vazia"),
+});

@@ -91,14 +91,15 @@ const ClientProductsPage: React.FC = () => {
 
   return (
     <div>
-      <h2>Produtos Disponíveis</h2>
+      <h2 className="mb-4">Produtos Disponíveis</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       
       <div className="row">
         {products.map((product) => (
-          <div key={product.id} className="col-md-4 mb-4">
+          <div key={product.id} className="col-xxl-3 col-xl-4 col-md-6 mb-4">
             <div className="card h-100">
               <div className="card-body">
+                <div className="product-img bg-secondary p-5 mb-3 rounded-2"></div>
                 <h5 className="card-title">{product.name}</h5>
                 <p className="card-text">{product.description}</p>
                 <p className="card-text">
@@ -113,7 +114,7 @@ const ClientProductsPage: React.FC = () => {
               </div>
               <div className="card-footer">
                 <button
-                  className="btn btn-primary w-100"
+                  className="btn btn-primary w-100 my-2"
                   onClick={() => handleMakeOrder(product.id)}
                   disabled={product.stock === 0 || orderLoading === product.id}
                 >
