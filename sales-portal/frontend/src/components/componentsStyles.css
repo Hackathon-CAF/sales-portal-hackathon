@@ -1,0 +1,62 @@
+/* --- Variáveis de tema --- */
+:root {
+  --primary-color: #a51326;
+  --primary-dark: #8a0c0c;
+  --bg-light: #eeeeee;
+  --bg-dark: #1f1f1f;
+  --text-dark: #333;
+  --text-light: #eee;
+  --radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+.sidebar-container {
+  background-color: var(--bg-light);
+  padding: 1.5rem;
+  width: 220px;
+  min-width: 220px;
+  border-right: 2px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 100vh; /* garante altura total */
+  position: sticky;  /* mantém fixa ao rolar o conteúdo */
+  top: 0;
+  transition: var(--transition);
+}
+
+.sidebar-title {
+  color: var(--primary-color);
+}
+
+.sidebar-link {
+  padding: 0.5rem 0;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.sidebar-link:hover {
+  background-color: var(--primary-color);
+  color: white;
+  padding-left: 1rem;
+}
+
+.btn-outline-primary {
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(1.02);
+}
+
+.modal-content {
+  border-radius: var(--radius);
+}
+
+.navbar {
+  background-color: var(--primary-dark);
+}
+

@@ -38,34 +38,50 @@ const AdminTransactionsPage: React.FC = () => {
   if (!user || user.role !== "admin") return <p>Acesso negado</p>;
 
   return (
-    <div className="container mt-3">
-      <h2>Transações</h2>
+    <div className="content-container p-2">
+      <h2 className="mt-2 mb-4 page-title">Transações</h2>
+
       {loading && <p>Carregando...</p>}
       {error && <p className="text-danger">{error}</p>}
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Produto</th>
-            <th>Status</th>
-            <th>Data</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((t) => (
-            <tr key={t.transactionId}>
-              <td>{t.transactionId}</td>
-              <td>{t.customer.name}</td>
-              <td>{t.product.name}</td>
-              <td>{t.status}</td>
-              <td>{new Date(t.date).toLocaleString()}</td>
-              <td>R$ {t.totalPrice.toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <div className="card shadow-sm p-3 bg-light rounded table-card">
+        <div className="table-responsive">
+          <table className="table table-hover align-middle ">
+            <thead className="table-header">
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Produto</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((t) => (
+                <tr key={t.transactionId}>
+                  <td>{t.transactionId}</td>
+                  <td>{t.customer.name}</td>
+                  <td>{t.product.name}</td>
+                  <td>
+                    <span className={`badge ${
+                      t.status === "Concluído"
+                        ? "bg-success"
+                        : t.status === "Pendente"
+                        ? "bg-warning text-dark"
+                        : "bg-secondary"
+                    }`}>
+                      {t.status}
+                    </span>
+                  </td>
+                  <td>{new Date(t.date).toLocaleString()}</td>
+                  <td>R$ {t.totalPrice.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

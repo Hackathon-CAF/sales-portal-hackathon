@@ -111,6 +111,23 @@ model SupportTicket {
   openedAt    DateTime  @default(now())
   closedAt    DateTime?
   product     Product   @relation(fields: [productId], references: [id])
+
+  messages TicketMessage[]
+}
+
+model TicketMessage {
+  id        Int           @id @default(autoincrement())
+  ticketId  Int
+  sender    MessageSender
+  content   String
+  createdAt DateTime      @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id])
+}
+
+enum MessageSender {
+  user
+  admin
 }
 
 enum ClientType {

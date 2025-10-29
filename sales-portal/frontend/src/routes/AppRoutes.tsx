@@ -49,7 +49,7 @@ const AppRoutes: React.FC = () => {
 
   // Usuário logado
   return (
-    <div className="d-flex">
+    <div className="d-flex min-vh-100">
       <SideBar isAdmin={user.role === "admin"} />
       <div className="flex-grow-1">
         <Navbar />
