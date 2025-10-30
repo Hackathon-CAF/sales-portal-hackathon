@@ -167,6 +167,8 @@ export class AuthController {
         id: true,
         name: true,
         email: true,
+        city: true,
+        state: true,
         role: true,
         segment: true,
         totalSpent: true

@@ -5,6 +5,8 @@ interface User {
   id: number;
   name: string;
   email: string;
+  city: string;
+  state: string;
   role: "admin" | "user";
   segment?: "gold" | "silver" | "bronze" | string;
   totalSpent?: number;
@@ -50,6 +52,7 @@ const AdminUsersPage: React.FC = () => {
               <th>ID</th>
               <th>Nome</th>
               <th>Email</th>
+              <th>Endereço</th>
               <th>Função</th>
               <th>Segmento</th>
               <th>Total Gasto</th>
@@ -61,6 +64,7 @@ const AdminUsersPage: React.FC = () => {
                 <td>{u.id}</td>
                 <td>{u.name}</td>
                 <td>{u.email}</td>
+                <td>{u.city || u.state ? `${u.city || ""}${u.city && u.state ? " (" : ""}${u.state  || ""}${u.city && u.state ? ")" : ""}` : "-"}</td>
                 <td>
                   <span
                     className={`badge ${
