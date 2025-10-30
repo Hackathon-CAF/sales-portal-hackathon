@@ -24,6 +24,14 @@ const AdminProductsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<EditableProduct | null>(null);
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    category: "",
+  });
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -40,6 +48,39 @@ const AdminProductsPage: React.FC = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newProduct.name || !newProduct.price || !newProduct.stock) {
+      alert("Preencha todos os campos obrigatórios!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: newProduct.name,
+          description: newProduct.description,
+          price: Number(newProduct.price),
+          stock: Number(newProduct.stock),
+          category: newProduct.category,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro ao criar produto");
+
+      setProducts([...products, data.product]);
+      setNewProduct({ name: "", description: "", price: "", stock: "", category: "" });
+      alert("Produto criado com sucesso!");
+    } catch (err: any) {
+      alert(err.message);
     }
   };
 
@@ -102,6 +143,74 @@ const AdminProductsPage: React.FC = () => {
     <div className="container">
       <h2 className="mt-2 mb-4">Gerenciamento de Produtos</h2>
       {error && <div className="alert alert-danger">{error}</div>}
+
+      <div className="card shadow-sm p-3 mb-4">
+        <h5>Adicionar Novo Produto</h5>
+        <form onSubmit={handleCreateProduct} className="row g-3 mt-2">
+          <div className="col-md-4">
+            <label className="form-label">Nome*</label>
+            <input
+              aria-label="name"
+              className="form-control"
+              value={newProduct.name}
+              onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Categoria</label>
+            <input
+              aria-label="category"
+              className="form-control"
+              value={newProduct.category}
+              onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
+            />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Preço*</label>
+            <input
+              aria-label="price"
+              type="number"
+              className="form-control"
+              min="0"
+              step="0.01"
+              value={newProduct.price}
+              onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="col-md-4">
+            <label className="form-label">Estoque*</label>
+            <input
+              aria-label="stock"
+              type="number"
+              className="form-control"
+              min="0"
+              step="1"
+              value={newProduct.stock}
+              onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="col-md-8">
+            <label className="form-label">Descrição</label>
+            <input
+              aria-label="description"
+              className="form-control"
+              value={newProduct.description}
+              onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
+            />
+          </div>
+
+          <div className="col-12 text-end">
+            <button type="submit" className="btn btn-success">Adicionar Produto</button>
+          </div>
+        </form>
+      </div>
 
       <div className="row">
         {products.map(product => (
@@ -191,12 +300,6 @@ const AdminProductsPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {products.length === 0 && !loading && (
-        <div className="text-center text-muted mt-5">
-          <h4>Nenhum produto cadastrado</h4>
         </div>
       )}
     </div>
