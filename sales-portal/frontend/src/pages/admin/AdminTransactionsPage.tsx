@@ -54,14 +54,19 @@ const AdminTransactionsPage: React.FC = () => {
     fetchTransactions();
   }, []);
 
+  const handleOpenDashboard = () => {
+    window.open("http://localhost:8501", "_blank");
+  };
+
   if (!user || user.role !== "admin") return <p>Acesso negado</p>;
 
   return (
     <div className="content-container p-2">
       <h2 className="mt-2 mb-4 page-title">Transações</h2>
-
-      {/* FILTROS */}
-      <div className="card p-3 mb-4 shadow-sm">
+      <button className="btn btn-primary mb-4" onClick={handleOpenDashboard}>
+        📊 Abrir Dashboard
+      </button>
+      <div className="card p-3 mb-4 shadow-lg">
         <div className="row g-2">
           <div className="col-md-2">
             <label>Data Inicial:</label>

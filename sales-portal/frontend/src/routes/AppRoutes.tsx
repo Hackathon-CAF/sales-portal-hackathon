@@ -21,6 +21,7 @@ import ClientOrdersPage from "../pages/client/ClientOrdersPage";
 import ClientProductsPage from "../pages/client/ClientProductsPage";
 import ClientSupportPage from "../pages/client/ClientSupportPage";
 import LandingPage from "../pages/LandingPage";
+import AdminOrdersPage from "../pages/admin/AdminOrdersPage";
 
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth();
@@ -62,6 +63,7 @@ const AppRoutes: React.FC = () => {
               <>
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/products" element={<AdminProductsPage />} />
+                <Route path="/admin/orders" element={<AdminOrdersPage />} />
                 <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
                 <Route path="/admin/production" element={<AdminProductionPage />} />
                 <Route path="/admin/support" element={<AdminSupportPage />} />
