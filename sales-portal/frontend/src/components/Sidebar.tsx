@@ -15,6 +15,7 @@ const SideBar: React.FC<SideBarProps> = ({ isAdmin = false }) => {
         <>
           <Link to="/admin/products" className="sidebar-link mb-2">Produtos</Link>
           <Link to="/admin/users" className="sidebar-link mb-2">Usuários</Link>
+          <Link to="/admin/orders" className="sidebar-link mb-2">Pedidos</Link>
           <Link to="/admin/transactions" className="sidebar-link mb-2">Transações</Link>
           <Link to="/admin/production" className="sidebar-link mb-2">Produção</Link>
           <Link to="/admin/support" className="sidebar-link mb-2">Suporte</Link>

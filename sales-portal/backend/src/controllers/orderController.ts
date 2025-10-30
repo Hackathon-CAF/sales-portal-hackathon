@@ -88,84 +88,54 @@ export class OrderController {
     }
   };
 
-  adminCreate: RequestHandler = async (req, res) => {
+  listOrders: RequestHandler = async (req, res) => {
     try {
-      const { userId, productId, quantity } = req.body;
+      const { userId, status, startDate, endDate } = req.query;
 
-      const user = await prisma.user.findUnique({ where: { id: userId } });
-      const product = await prisma.product.findUnique({ where: { id: productId } });
+      const filters: any = {};
 
-      if (!user || !product)
-        return res.status(404).json({ message: "User or Product not found" });
+      if (userId) {
+        filters.userId = Number(userId);
+      }
 
-      const totalPrice = product.price * quantity;
+      if (status) {
+        filters.status = status;
+      }
 
-      const result = await prisma.$transaction(async (tx) => {
+      if (startDate || endDate) {
+        filters.createdAt = {};
+        if (startDate) filters.createdAt.gte = new Date(String(startDate));
+        if (endDate) filters.createdAt.lte = new Date(String(endDate));
+      }
 
-        const order = await tx.order.create({
-          data: {
-            userId,
-            productId,
-            quantity,
-            totalPrice,
-            city: user.city,
-            state: user.state,
-            status: "pending",
-            statusDetail: "Awaiting payment",
-          },
-        });
-
-        await tx.product.update({
-          where: { id: productId },
-          data: { stock: product.stock - quantity },
-        });
-
-        const updatedUser = await tx.user.update({
-          where: { id: userId },
-          data: { totalSpent: { increment: totalPrice } },
-        });
-
-        let newSegment: "Bronze" | "Silver" | "Gold" = "Bronze";
-        if (updatedUser.totalSpent > 10000) newSegment = "Gold";
-        else if (updatedUser.totalSpent > 5000) newSegment = "Silver";
-
-        if (newSegment !== updatedUser.segment) {
-          await tx.user.update({
-            where: { id: userId },
-            data: { segment: newSegment },
-          });
-        }
-
-        await tx.transaction.create({
-          data: {
-            orderId: order.id,
-            userId,
-            productId,
-            orderDate: order.createdAt,
-            status: order.status,
-            statusDetail: order.statusDetail,
-            city: user.city,
-            state: user.state,
-            clientName: user.name,
-            clientSegment: newSegment,
-            productName: product.name,
-            productCategory: product.category,
-            quantity,
-            unitPrice: product.price,
-            totalPrice,
-          },
-        });
-
-        return order;
+      const orders = await prisma.order.findMany({
+        where: filters,
+        include: {
+          product: true,
+          user: { select: { id: true, name: true, city: true, state: true } },
+        },
+        orderBy: { createdAt: "desc" },
       });
 
-      return res.status(201).json({
-        message: "Order and transaction created successfully!",
-        order: result,
-      });
+      const result = orders.map((o) => ({
+        id: o.id,
+        userId: o.userId,
+        productId: o.productId,
+        quantity: o.quantity,
+        totalPrice: o.totalPrice,
+        status: o.status,
+        statusDetail: o.statusDetail,
+        city: o.city ?? o.user?.city,
+        state: o.state ?? o.user?.state,
+        createdAt: o.createdAt,
+        product: o.product,
+        user: o.user,
+      }));
+
+      res.json(result);
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: "Error creating order" });
+      console.error("Erro ao listar pedidos:", error);
+      res.status(500).json({ error: "Erro ao listar pedidos" });
     }
   };
 
@@ -198,6 +168,46 @@ export class OrderController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Erro ao buscar pedidos do usuário" });
+    }
+  };
+
+  updateOrderStatus: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, statusDetail } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: "ID do pedido é obrigatório" });
+      }
+
+      if (!status && !statusDetail) {
+        return res.status(400).json({ error: "Informe status ou statusDetail para atualizar" });
+      }
+
+      const order = await prisma.order.findUnique({ where: { id: Number(id) } });
+      if (!order) {
+        return res.status(404).json({ error: "Pedido não encontrado" });
+      }
+
+      const updatedOrder = await prisma.order.update({
+        where: { id: Number(id) },
+        data: {
+          status: status || order.status,
+          statusDetail: statusDetail || order.statusDetail,
+        },
+        include: {
+          product: true,
+          user: { select: { id: true, name: true, city: true, state: true } },
+        },
+      });
+
+      res.json({
+        message: "Pedido atualizado com sucesso",
+        order: updatedOrder,
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar pedido:", error);
+      res.status(500).json({ error: "Erro interno ao atualizar o pedido" });
     }
   };
 }

@@ -154,6 +154,52 @@ export class TransactionController {
     }
   };
 
+  // GET /api/transactions/dashboard
+  dashboard: RequestHandler = async (req, res) => {
+    const apiKey = req.headers["x-api-key"];
+
+    if (apiKey !== process.env.API_DASHBOARD_KEY) {
+      return res.status(403).json({ message: "Acesso negado: API key inválida." });
+    }
+
+    try {
+      const transactions = await prisma.transaction.findMany({
+        include: {
+          user: { select: { id: true, name: true, segment: true, city: true, state: true } },
+          product: { select: { id: true, name: true, category: true, price: true } },
+          order: { select: { id: true, status: true, createdAt: true } },
+        },
+        orderBy: { id: "desc" },
+      });
+
+      const formatted = transactions.map((t) => ({
+        transactionId: t.id,
+        orderId: t.order?.id,
+        date: t.order?.createdAt,
+        status: t.order?.status,
+        totalPrice: t.totalPrice,
+        customer: {
+          id: t.user.id,
+          name: t.user.name,
+          city: t.user.city,
+          state: t.user.state,
+          segment: t.user.segment,
+        },
+        product: {
+          id: t.product.id,
+          name: t.product.name,
+          category: t.product.category,
+          unitPrice: t.product.price,
+        },
+      }));
+
+      return res.json({ data: formatted });
+    } catch (error) {
+      console.error("Erro ao buscar transações do dashboard:", error);
+      return res.status(500).json({ message: "Erro interno no servidor" });
+    }
+  };
+
   // DELETE /transactions/:id
   delete: RequestHandler = async (req, res) => {
     const { id } = req.params;
