@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f6fa;
+  color: #222;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-color);
+}
+
+button:focus, input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.25);
+}
+
+:root {
+  --primary-color: #b41818;
+  --primary-dark: #8a0c0c;
+  --secondary-color: #6c757d;
+  --accent-color: #ffc400;
+  
+  --bg-light: #ffffff;
+  --bg-page: #f5f6fa;
+  --bg-dark: #181a1f;
+  
+  --text-dark: #1f1f1f;
+  --text-muted: #6c757d;
+  
+  --radius: 10px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+img {
+  width: 4.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.7rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+button, .btn {
+  font-family: inherit;
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+input, textarea, select {
+  border-radius: var(--radius);
+  border: 1px solid #ccc;
+  padding: 0.6rem 0.8rem;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary-color);
+}
+
+.card {
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+.rounded {
+  border-radius: var(--radius) !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
+}
+
+.shadow-lg {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+}
+
+.product-img {
+  height: 15rem;
+}
+
+.ticket-card {
+  background-color: white;
+  max-width: 100%;
+  flex: 1 1 30rem; 
+}
+
+.ticket-title {
+  color: var(--primary-dark);
+}
+
+.table td,
+.table th {
+  padding: 0.3rem 1rem; /* aumenta o espaçamento lateral */
+}
+
+.table-card {
+  border-radius: var(--radius);
+  background-color: white;
+}
+
+.table-header {
+  background-color: var(--primary-dark);
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.table-hover tbody tr:hover td {
+  background-color: rgb(255, 224, 229);
+  transition: background-color 0.2s ease;
+}
+
+.segment-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: #333;
+  text-transform: capitalize;
+}
+
+.segment-badge.gold {
+  background-color: #ffde59; 
+  color: #664d03;
+}
+
+.segment-badge.silver {
+  background-color: #d9d9d9; 
+  color: #3a3a3a;
+}
+
+.segment-badge.bronze {
+  background-color: #cd7f32;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .table-card {
+    padding: 0.5rem;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
+}
+
