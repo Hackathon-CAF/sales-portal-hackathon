@@ -8,6 +8,7 @@ import { SupportController } from "../controllers/supportController";
 import { IndicatorController } from "../controllers/indicatorController";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { adminMiddleware } from "../middlewares/adminMiddleware";
+import { dashboardAuthMiddleware } from "../middlewares/dashboardAuthMiddleware";
 
 const router = express.Router();
 
@@ -28,15 +29,18 @@ router.get("/users", authMiddleware, adminMiddleware, auth.showUsers);
 router.put("/users", authMiddleware, auth.updateUser);
 router.put("/users/role", authMiddleware, adminMiddleware, auth.updateRole);
 
-router.get("/order", authMiddleware, orders.userOrders)
+router.get("/order", authMiddleware, orders.userOrders);
+router.get("/order/admin", authMiddleware, adminMiddleware, orders.listOrders);
 router.post("/order/user", authMiddleware, orders.userCreate);
-router.post("/order/admin", authMiddleware, adminMiddleware, orders.adminCreate);
+router.put("/order/:id", authMiddleware, adminMiddleware, orders.updateOrderStatus);
+
 
 router.get("/stock", authMiddleware, stock.index);
 router.post("/stock", authMiddleware, adminMiddleware, stock.create);
 router.put("/stock/:id", authMiddleware, adminMiddleware, stock.update);
 
 router.get("/transactions/admin", authMiddleware, adminMiddleware, transaction.index);
+router.get("/transactions/dashboard", dashboardAuthMiddleware, transaction.dashboard);
 router.get("/transactions/:id", authMiddleware, adminMiddleware, transaction.show);
 router.delete("/transactions/:id", authMiddleware, adminMiddleware, transaction.delete);
 
