@@ -92,3 +92,23 @@ npm run dev
 ```
 http://localhost:5173
 ```
+
+---
+
+## Configuração do DashBoard
+```
+# Volte para a raiz e vá para o dashboard
+cd ../dashboard
+
+# Instale as dependências
+python3 -m pip install requests pandas plotly streamlit python-dotenv
+
+# Inicie o server do streamlit
+python3 -m streamlit run hackathon.py
+```
+#### O dashboard rodará em:
+```
+http://localhost:8501
+```
+
+
