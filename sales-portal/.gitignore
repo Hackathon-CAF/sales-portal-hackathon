@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+arquivoParaGuardarAChave.ts
 
 # Editor directories and files
 .vscode/*

@@ -246,7 +246,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Pietro\\OneDrive\\Documentos\\arquivosVSCode\\Projetos\\HackathonCAF2025\\sales-portal-hackathon\\sales-portal\\backend\\src\\generated\\prisma",
+      "value": "C:\\Users\\gcsal\\Documents\\GitHub\\sales-portal-hackathon\\sales-portal\\backend\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -260,7 +260,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Pietro\\OneDrive\\Documentos\\arquivosVSCode\\Projetos\\HackathonCAF2025\\sales-portal-hackathon\\sales-portal\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\gcsal\\Documents\\GitHub\\sales-portal-hackathon\\sales-portal\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -274,7 +274,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

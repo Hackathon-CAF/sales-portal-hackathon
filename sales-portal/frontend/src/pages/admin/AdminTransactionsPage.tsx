@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { chave_api_gpt } from "./arquivoParaGuardarAChave";
 
 interface Transaction {
   transactionId: number;
@@ -25,6 +26,10 @@ const AdminTransactionsPage: React.FC = () => {
   const [region, setRegion] = useState("");
   const [productCategory, setProductCategory] = useState("");
   const [clientSegment, setClientSegment] = useState("");
+
+  // Modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState<string>("");
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -58,14 +63,51 @@ const AdminTransactionsPage: React.FC = () => {
     window.open("http://localhost:8501", "_blank");
   };
 
+  const handleAIRequest = async () => {
+    try {
+      setModalContent("Carregando resposta da IA...");
+      setModalVisible(true);
+
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${chave_api_gpt}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "Você é um assistente útil para o administrador da plataforma." },
+            { role: "user", content: `Gere insights desses dados: ${JSON.stringify(transactions)}` },
+          ],
+        }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao se comunicar com o AI");
+
+      const data = await res.json();
+      const content = data.choices?.[0]?.message?.content || "Sem resposta do modelo.";
+      setModalContent(content);
+    } catch (err: any) {
+      setModalContent("Erro: " + err.message);
+    }
+  };
+
   if (!user || user.role !== "admin") return <p>Acesso negado</p>;
 
   return (
     <div className="content-container p-2">
       <h2 className="mt-2 mb-4 page-title">Transações</h2>
-      <button className="btn btn-primary mb-4" onClick={handleOpenDashboard}>
-        📊 Abrir Dashboard
-      </button>
+      <div className="d-flex gap-2 mb-4">
+        <button className="btn btn-primary" onClick={handleOpenDashboard}>
+          📊 Abrir Dashboard
+        </button>
+        <button className="btn btn-secondary" onClick={handleAIRequest}>
+          💬 Análise com IA
+        </button>
+      </div>
+
+      {/* FILTROS */}
       <div className="card p-3 mb-4 shadow-lg">
         <div className="row g-2">
           <div className="col-md-2">
@@ -153,14 +195,14 @@ const AdminTransactionsPage: React.FC = () => {
                   <td>{t.transactionId}</td>
                   <td>{t.customer.name}</td>
                   <td>
-                  {t.customer.segment ? (
-                    <span className={`segment-badge ${t.customer.segment.toLowerCase()}`}>
-                      {t.customer.segment.charAt(0).toUpperCase() + t.customer.segment.slice(1)}
-                    </span>
-                  ) : (
-                    "-"
-                  )}
-                </td>
+                    {t.customer.segment ? (
+                      <span className={`segment-badge ${t.customer.segment.toLowerCase()}`}>
+                        {t.customer.segment.charAt(0).toUpperCase() + t.customer.segment.slice(1)}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td>{t.product.name}</td>
                   <td>{t.product.category}</td>
                   <td>
@@ -185,6 +227,27 @@ const AdminTransactionsPage: React.FC = () => {
           </table>
         </div>
       </div>
+      {modalVisible && (
+  <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+    <div className="modal-dialog modal-dialog-centered modal-xl"> {/* ← maior e centralizado */}
+      <div className="modal-content">
+        <div className="modal-header">
+          <h5 className="modal-title fs-4">💬 Resposta da IA</h5>
+          <button type="button" className="btn-close" onClick={() => setModalVisible(false)}></button>
+        </div>
+        <div className="modal-body" style={{ whiteSpace: "pre-wrap", fontSize: "1.1rem", lineHeight: "1.6" }}>
+          <p>{modalContent}</p>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={() => setModalVisible(false)}>
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
