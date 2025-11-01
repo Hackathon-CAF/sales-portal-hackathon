@@ -107,7 +107,7 @@ pip install requests pandas plotly streamlit python-dotenv
 streamlit run hackathon.py
 
 ```
-# Observação:
+## Observação:
 #### Em caso de erro ao usar o python, substituir pelo python3
 ```
 # Instale as dependências
