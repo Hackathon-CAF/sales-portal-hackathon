@@ -61,6 +61,7 @@ PORT="..."
 CLIENT_URL="https://site-permitido.com" ou "http://localhost:PORTA_DO_SERVIDOR"
 ADMIN_EMAIL="..."
 ADMIN_PASSWORD="..."
+API_DASHBOARD_KEY="dashboard_super_secret_key"
 ```
 #### Gere as tabelas no banco de dados:
 ```
