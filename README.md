@@ -115,7 +115,7 @@ streamlit run hackathon.py
 python3 -m pip install requests pandas plotly streamlit python-dotenv
 
 # Inicie o server do streamlit
-python3 -m streamlit run hackathon.py
+python3 -m streamlit run dashboard.py
 
 ```
 #### O dashboard rodará em:
