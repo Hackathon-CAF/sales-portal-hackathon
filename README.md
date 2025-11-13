@@ -105,7 +105,7 @@ cd ../dashboard
 pip install requests pandas plotly streamlit python-dotenv
 
 # Inicie o server do streamlit
-streamlit run hackathon.py
+streamlit run dashboard.py
 
 ```
 ## Observação:
